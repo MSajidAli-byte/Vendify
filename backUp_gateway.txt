@@ -1,0 +1,198 @@
+from django.shortcuts import render, redirect
+from django.conf import settings
+from django.http import HttpResponse
+import datetime
+from .models import cart
+
+import datetime
+
+def process_payment(request):
+    items = cart.objects.filter(user_id=request.user, status=False)
+    products = ""
+    amt = 0
+    inv = "INV10001-"
+    cart_ids = ""
+    p_ids = ""
+
+    for j in items:
+        products += str(j.product.product_name) + "\n"
+        p_ids += str(j.product.id) + ","
+        amt += float(j.product.sale_price)
+        inv += str(j.id)
+        cart_ids += str(j.id) + ","
+
+    integrity_salt = settings.JAZZCASH_INTEGRITY_SALT
+    txn_ref_no = f"TXN{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+    post_url = "https://sandbox.jazzcash.com.pk/CustomerPortal/transactionmanagement/merchantform/"
+    txn_datetime = datetime.datetime.now()
+    expiry_datetime = txn_datetime + timedelta(hours=1)
+    
+    data = {
+        # "pp_Version": "1.1",
+        # "pp_TxnType": "MPAY",
+        # # "pp_TxnType": "MWALLET",
+        # "pp_Language": "EN",
+        # "pp_MerchantID": settings.JAZZCASH_MERCHANT_ID,
+        # "pp_SubMerchantID": "",
+        # "pp_Password": settings.JAZZCASH_PASSWORD,
+        # "pp_BankID": "TBANK",
+        # # "pp_BankID": "",
+        # "pp_ProductID": "RETL",
+        # "pp_TxnRefNo": txn_ref_no,
+        # "pp_Amount": str(int(amt * 100)),  # Amount in paisa
+        # "pp_TxnCurrency": "PKR",
+        # # "pp_TxnDateTime": datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
+        # "pp_BillReference": inv,
+        # "pp_Description": products,
+        # "pp_ReturnURL": request.build_absolute_uri(reverse("jazzcash_return")),
+        # "pp_TxnDateTime": txn_datetime.strftime("%Y%m%d%H%M%S"),
+        # "pp_TxnExpiryDateTime": expiry_datetime.strftime("%Y%m%d%H%M%S"),
+        "pp_Version": "1.1",
+        "pp_TxnType": "MWALLET",
+        "pp_Language": "EN",
+        "pp_MerchantID": settings.JAZZCASH_MERCHANT_ID,
+        "pp_Password": settings.JAZZCASH_PASSWORD,
+        "pp_TxnRefNo": txn_ref_no,
+        "pp_Amount": str(amt * 100),  # Amount in paisa
+        "pp_TxnCurrency": "PKR",
+        "pp_TxnDateTime": txn_datetime,
+        "pp_BillReference": "INV10001-345",
+        "pp_Description": "Test transaction from Django site",
+        "pp_TxnExpiryDateTime": expiry_datetime,
+        "pp_ReturnURL": request.build_absolute_uri("/jazzcash_return/"),
+        "pp_SecureHash": "",  # Placeholder for now
+        "ppmpf_1": "",
+        "ppmpf_2": "",
+        "ppmpf_3": "",
+        "ppmpf_4": "",
+        "ppmpf_5": "",
+    }
+
+    # Generate Secure Hash
+    # ordered_keys = [
+    #     "pp_Amount", "pp_BankID", "pp_BillReference", "pp_Description", "pp_Language",
+    #     "pp_MerchantID", "pp_Password", "pp_ProductID", "pp_ReturnURL", "pp_SubMerchantID",
+    #     "pp_TxnCurrency", "pp_TxnDateTime", "pp_TxnRefNo", "pp_TxnType", "pp_Version"
+    # ]
+    
+        
+    ordered_keys = [
+    "pp_Amount", "pp_BankID", "pp_BillReference", "pp_Description", "pp_Language",
+    "pp_MerchantID", "pp_Password", "pp_ProductID", "pp_ReturnURL", "pp_SubMerchantID",
+    "pp_TxnCurrency", "pp_TxnDateTime", "pp_TxnExpiryDateTime", "pp_TxnRefNo",
+    "pp_TxnType", "pp_Version"
+    # "pp_Amount", "pp_BankID", "pp_BillReference", "pp_Description", "pp_Language",
+    # "pp_MerchantID", "pp_Password", "pp_ProductID", "pp_ReturnURL", "pp_SubMerchantID",
+    # "pp_TxnCurrency", "pp_TxnDateTime", "pp_TxnExpiryDateTime", "pp_TxnRefNo",
+    # "pp_TxnType", "pp_Version", "pp_SecureHash"
+    ]
+
+    # hash_string = "&".join([data[key] for key in ordered_keys])
+    # hash_string = settings.JAZZCASH_INTEGRITY_SALT + "&" + hash_string
+    # secure_hash = hashlib.sha256(hash_string.encode('utf-8')).hexdigest()
+    
+    # # secure_hash = response_data.get('pp_SecureHash')
+    # if not secure_hash:
+    #     return HttpResponse("Secure hash missing from response")
+    # data["pp_SecureHash"] = secure_hash
+    
+
+    # return render(request, "jazzcash_redirect.html", {"post_url": post_url, "data": data})
+    
+    # Generate the secure hash
+    sorted_keys = sorted([k for k in data.keys() if k != 'pp_SecureHash'])
+    hash_string = integrity_salt + '&' + '&'.join(data[k] for k in sorted_keys)
+    secure_hash = hashlib.sha256(hash_string.encode('utf-8')).hexdigest().upper()
+
+    data['pp_SecureHash'] = secure_hash
+
+    # JazzCash payment endpoint
+    jazzcash_url = settings.JAZZCASH_POST_URL  # Example: https://sandbox.jazzcash.com.pk/CustomerPortal/transactionmanagement/merchantform/
+
+    return render(request, 'payment_form.html', {'jazzcash_url': jazzcash_url, 'params': data})
+
+@csrf_exempt
+def payment_done(request):
+    return HttpResponse("Payment Successful")
+
+@csrf_exempt
+def payment_cancelled(request):
+    return HttpResponse("Payment Cancelled")
+
+
+@csrf_exempt
+def jazzcash_return(request):
+    # status = request.POST.get('pp_ResponseCode')
+    # message = request.POST.get('pp_ResponseMessage')
+
+    # if status == '000':
+    #     return HttpResponse("Payment Successful: " + message)
+    # else:
+    #     return HttpResponse("Payment Failed: " + message)
+    
+    # response_data = request.POST.dict()
+    # received_hash = response_data.get("pp_SecureHash")
+
+    # if not received_hash:
+    #     return HttpResponse("No SecureHash received. Payment Failed.")
+
+    # # Remove SecureHash from the dict for calculation
+    # hash_data = {k: v for k, v in response_data.items() if k != 'pp_SecureHash'}
+    # sorted_string = settings.JAZZCASH_INTEGRITY_SALT + '&' + '&'.join(
+    #     str(hash_data[k]) for k in sorted(hash_data.keys()) if hash_data[k]
+    # )
+
+    # calculated_hash = hashlib.sha256(sorted_string.encode()).hexdigest().upper()
+
+    # if calculated_hash != received_hash:
+    #     return HttpResponse("Hash Mismatch. Payment not verified.")
+
+    # # Now verify the transaction was successful
+    # if response_data.get('pp_ResponseCode') == '000':
+    #     return HttpResponse("Payment Successful!")
+    # else:
+    #     return HttpResponse(f"Payment Failed: {response_data.get('pp_ResponseMessage')}")
+    
+    
+    if request.method == "POST":
+        # Debug print full response from JazzCash
+        print("\n🎯 JazzCash Response:")
+        pprint.pprint(dict(request.POST))
+
+        response_code = request.POST.get('pp_ResponseCode')
+        response_msg = request.POST.get('pp_ResponseMessage')
+        secure_hash = request.POST.get('pp_SecureHash')
+
+        # Optional: Verify hash (we can add this later)
+        
+        response_data = request.GET.dict()
+        received_hash = response_data.pop('pp_SecureHash', None)
+
+        ordered_keys = [k for k in sorted(response_data.keys())]  # or follow same order as request
+        hash_string = '&'.join([response_data[k] for k in ordered_keys])
+        hash_string = settings.JAZZCASH_INTEGRITY_SALT + '&' + hash_string
+        generated_hash = hashlib.sha256(hash_string.encode('utf-8')).hexdigest()
+
+        if received_hash == generated_hash and response_data.get('pp_ResponseCode') == '000':
+            return HttpResponse("Payment Successful")
+        else:
+            return HttpResponse("Payment Failed: Sorry! Your transaction was not successful. Please try again later.")
+
+        if response_code == "000":
+            return HttpResponse("✅ Payment Successful: " + response_msg)
+        else:
+            return HttpResponse("❌ Payment Failed: " + response_msg)
+    else:
+        return HttpResponse("❗ Invalid request method.")
+
+# @csrf_exempt
+# def payment_done(request):
+#     return render(request, "payment_success.html")
+
+# @csrf_exempt
+# def payment_cancelled(request):
+#     return render(request, "payment_failed.html")
+# @csrf_exempt
+# def jazzcash_return(request):
+#     # Here you can validate the JazzCash response
+#     return render(request, "redirect_to_jazzcash.html")

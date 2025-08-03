@@ -1,0 +1,38 @@
+Version 1, where we immediately and successfully got return from Jazzcash payment page without asking anything:
+
+def process_payment(request):
+    items = cart.objects.filter(user_id=request.user.id, status=False)
+    products = ""
+    amt = 0
+    inv = "INV10001-"
+    cart_ids = ""
+    for j in items:
+        products += str(j.product.product_name) + "\n"
+        amt += float(j.product.sale_price)
+        inv += str(j.id)
+        cart_ids += str(j.id) + ","
+
+    txn_ref = inv
+    txn_datetime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    expiry_datetime = (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime('%Y%m%d%H%M%S')
+
+    post_data = {
+        "pp_Version": "1.1",
+        "pp_TxnType": "MWALLET",
+        "pp_Language": "EN",
+        "pp_MerchantID": settings.JAZZCASH_MERCHANT_ID,
+        "pp_Password": settings.JAZZCASH_PASSWORD,
+        "pp_TxnRefNo": txn_ref,
+        "pp_Amount": str(int(amt * 100)),  # amount in paisa
+        "pp_TxnCurrency": "PKR",
+        "pp_TxnDateTime": txn_datetime,
+        "pp_BillReference": "billRef",
+        "pp_Description": products,
+        "pp_TxnExpiryDateTime": expiry_datetime,
+        "pp_ReturnURL": settings.JAZZCASH_RETURN_URL,
+        "pp_SecureHash": "",  # to be added
+    }
+
+    post_data["pp_SecureHash"] = generate_secure_hash(post_data, settings.JAZZCASH_HASH_KEY)
+
+    return render(request, 'process_payment.html', {'post_data': post_data})

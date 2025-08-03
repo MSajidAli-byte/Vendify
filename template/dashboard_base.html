@@ -1,0 +1,66 @@
+{% extends 'base.html' %} {% load static %} {% block baseblock %}
+
+{% if user.is_superuser %}
+  
+{% else %}
+<div class="container-fluid">
+  <div class="row">
+    <!-- left side menu -->
+    <div class="col-md-2 bg-dark text-justify p-5 text-light">
+        <nav class="navbar navbar-dark bg-dark">
+            <a href="" class="navbar-brand">
+                <div class="text-center py-2 d-flex align-items-center justify-content-center flex-column">
+                
+                {% if data.profile_pic %}
+                  <img src="/media/{{data.profile_pic}}" style="height: 50px; width: 50px; border-radius: 50%; display: block; margin: 0 auto;" alt="">
+                {% else %}
+                  <img src="{% static 'images/profile_pic1.jpg' %}" style="height: 50px; width: 50px; border-radius: 50%; display: block; margin: 0 auto;" alt="">  
+                {% endif %}
+                  
+                </div>
+            </a>
+            
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="{% url 'cust_dashboard' %}" class="nav-link">View Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'edit_profile' %}" class="nav-link">Edit Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'change_password' %}" class="nav-link">Change Password</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'sendemail' %}" class="nav-link">Send Email</a>
+                </li>
+                {% if user.is_staff %}
+                        <li class="nav-item">
+                          <a href="{% url 'add_product_view' %}" class="nav-link">Add Prodcut</a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="{% url 'my_products' %}" class="nav-link">My Prodcut</a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="{% url 'order_history' %}" class="nav-link">Order History</a>
+                        </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a href="{% url 'logout_user' %}" class="nav-link">Logout</a>
+                </li>
+            </ul>
+        </nav>
+
+      {% comment %} <h1>Admin Dashboard</h1>
+      <h2>Welcome {{user.first_name}} {{user.last_name}}</h2> {% endcomment %}
+    </div>
+
+    <!-- Right side Menu -->
+    <div class="col-md-10">
+        {% block dashboard %} {% endblock %}
+
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %} 

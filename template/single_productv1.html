@@ -1,0 +1,87 @@
+{% extends 'base.html' %} {% load static %}  
+
+{% block head %}
+<style>
+    th{
+    width:30%;
+}
+</style>
+{% endblock %}
+
+{% load bootstrap5 %}  {% bootstrap_css %}  {% bootstrap_javascript %}  {% block baseblock %}
+<div
+  class="container-fluid px-0"
+  style="
+    background: url('/static/images/c1.jpg');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  "
+>
+  <div class="row">
+    <div
+      class="col-md-12 py-5 my-5 font-weight-bold text-center text-light px-0"
+    >
+      <h1>Product Details</h1>
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="row p-5">
+    <div class="col-md-8 text-center mx-auto bg-light p-5 rounded shadow-sm">
+      <img
+        src="/media/{{product.product_image}}"
+        style="height: 300px; width: 100%"
+        alt=""
+      />
+
+      <table class="table table-bordered mt-4">
+        <tbody>
+          <tr>
+            <th>Product ID</th>
+            <td>{{ product.id }}</td>
+          </tr>
+          <tr>
+            <th>Product Name</th>
+            <td>{{ product.product_name }}</td>
+          </tr>
+          <tr>
+            <th>Market Price</th>
+            <td>&#8377; <del>{{ product.product_price }}</del></td>
+          </tr>
+          <tr>
+            <th>Offered Price</th>
+            <td>&#8377; {{ product.sale_price }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-4">
+      <h4 class="alert alert-secondary">Additional Product Information</h4>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Product Category</th>
+            <td>{{ product.product_category }}</td>
+          </tr>
+          <tr>
+            <th>Product Brand</th>
+            <td>{{ product.product_brand }}</td>
+          </tr>
+          <tr>
+            <th>Product Size</th>
+            <td>{{ product.product_size }}</td>
+          </tr>
+          <tr>
+            <th>Product Color</th>
+            <td>{{ product.product_color }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

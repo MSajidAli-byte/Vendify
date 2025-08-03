@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block baseblock %}
+
+<!-- Load dotLottie player script -->
+<script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js" type="module"></script>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6 mx-auto p-4 text-center" style="box-shadow: 0px 0px 10px gray;">
+            
+            <!-- Lottie animation for payment failure -->
+            <dotlottie-wc 
+                src="https://lottie.host/12754fcf-56a8-4b8f-82c0-6ad254907eec/iaztp9tDKX.lottie" 
+                style="width: 250px; height: 250px; margin: 0 auto;" 
+                speed="1" autoplay loop>
+            </dotlottie-wc>
+
+            <h1 class="alert alert-danger mt-3">PAYMENT FAILED</h1>
+
+            <div class="my-2">
+                <a href="{% url 'cart' %}" class="btn btn-success">Continue Shopping</a>
+                <a href="{% url 'cust_dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock baseblock %}

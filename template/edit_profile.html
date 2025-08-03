@@ -1,0 +1,181 @@
+{% extends 'dashboard_base.html' %} {% load static %} {% block head %}
+<style>
+  h1 {
+    font-family: cursive;
+    color: antiquewhite;
+  }
+  .box {
+    background: #a5c0cc;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgb(223, 211, 193);
+    text-align: justify;
+  }
+  .box img {
+    transition: all 0.3s ease-in-out; /* Smooth transition for hover effect */
+  }
+  .box img:hover {
+    transform: scale(1.1); /* Slight zoom effect */
+    background: rgba(0, 0, 0, 0.5);
+    color: rgb(212, 235, 245);
+  }
+  .img {
+    background-image: url("{% static 'images/profile_pic1.jpg' %}");
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+  }
+</style>
+{% endblock head %} {% block dashboard %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12 box img"></div>
+    <div class="col-md-12 bg-primary text-center p-5 text-light">
+      <h1>Edit Profile</h1>
+      <h2>Welcome {{ user.first_name }} {{ user.last_name }}</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 text-center mx-auto p-5">
+        <div class="text-center py-2">
+          <h2>Profile Picture</h2>
+          
+          {% if data.profile_pic %}
+            <img src="/media/{{data.profile_pic}}" style="height: 15%; width: 15%; border-radius: 50%;" alt="">
+          {% else %}
+            <img src="{% static 'images/profile_pic1.jpg' %}" style="height: 15%; width: 15%; border-radius: 50%;" alt="">  
+          {% endif %}
+            
+
+        </div>
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        {% if status %}
+            <div class="alert alert-primary">
+                <strong>Success!</strong> {{ status }}
+            </div>
+        {% endif %}
+            
+        <div class="form-group">
+          <div class="row">
+            <!-- First Name -->
+            <div class="col-md-6 p-2 text-justify">
+              <label>First Name</label>
+              <input
+                type="text"
+                class="form-control"
+                name="fname"
+                placeholder="Enter First Name"
+                value="{{ user.first_name }}"
+              />
+            </div>
+            <!-- Last Name -->
+            <div class="col-md-6 p-2 text-justify">
+              <label>Last Name</label>
+              <input
+                type="text"
+                class="form-control"
+                name="lname"
+                placeholder="Enter Last Name"
+                value="{{ user.last_name }}"
+              />
+            </div>
+            <!-- Email -->
+            <div class="col-md-6 p-2 text-justify">
+              <label>Email</label>
+              <input
+                type="email"
+                class="form-control"
+                name="email"
+                placeholder="Enter Email"
+                value="{{ user.email }}"
+              />
+            </div>
+            <!-- Profile Picture -->
+            <div class="col-md-6 p-2 text-justify">
+              <label>Profile Picture</label>
+              <input type="file" class="form-control" name="image" />
+            </div>
+          </div>
+        </div>
+
+        <!-- contact number and age -->
+
+        <div class="form-group">
+          <div class="row">
+            <!-- Contact Number -->
+            <div class="col-md-6 p-2 text-justify">
+              <label>Contact Number</label>
+              <input
+                type="text"
+                class="form-control"
+                name="contact"
+                placeholder="Enter Contact Number"
+                value="{{ data.contact_number }}"
+                pattern="[0-9]{11}"
+                title="Number must contain 11 digits only!!"
+              />
+            </div>
+            <!-- Age -->
+            <div class="col-md-6 p-2 text-justify">
+              <label>Age (in years)</label>
+              <input
+                type="number"
+                class="form-control"
+                name="age"
+                placeholder="Enter Age"
+                min="15"
+                max="99"
+                value="{{ data.age }}"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Address and City -->
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>City</label>
+                    <input type="text" class="form-control" name="city" placeholder="Enter City" value="{{data.city}}">
+                </div>
+                <div class="col-md-6">
+                    <label>Gender</label>
+          
+                    <select name="gender"  class="form-control">
+                        <option value="Male">Male</option>
+
+                        {% if data.gender == "Female" %}
+                        <option value="Female" selected>Female</option>
+                        {% else %}
+                        <option value="Female">Female</option>
+                        {% endif %}
+
+                        {% if data.gender == "Others" %}
+                        <option value="Others" selected>Others</option>
+                        {% else %}
+                        <option value="Others">Others</option>
+                        {% endif %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Occupation</label>
+            <input type="text" class="form-control" placeholder="Enter Occupation" name="occ" value="{{data.occupation}}">
+        </div>
+        
+        <div class="form-group">
+            <label>About You</label>
+            <textarea name="about" placeholder="Write About Yourself" class="form-control">{{data.about}}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary box btn-dark my-1">Update Profile</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock dashboard %}

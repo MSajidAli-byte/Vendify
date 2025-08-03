@@ -1,0 +1,46 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block dashboard %}
+    
+    
+<div class="container-fluid">
+    <div class="row">
+      <div class="col-md-6 mx-auto bg-primary text-center p-5 text-dark">
+        <div class="card">
+            <div class="card-header">
+                <h1>Customer Dashboard</h1>
+                <div class="card-body">
+                    <h2>Welcome {{user.first_name}} {{user.last_name}}  </h2>
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>User ID</th>
+                                <td>{{user.id}}</td>
+                            </tr>
+                            <tr>
+                                <th>Username</th>
+                                <td>{{user.username}}</td>
+                            </tr>
+                            <tr>
+                                <th>Full Name</th>
+                                <td>{{user.first_name}} {{user.last_name}}</td>
+                            </tr>
+                            <tr>
+                                <th>Last Login</th>
+                                <td>{{user.last_login}}</td>
+                            </tr>
+                            <tr>
+                                <th>Join Date</th>
+                                <td>{{user.date_joined}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% endblock dashboard %}

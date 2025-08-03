@@ -1,0 +1,156 @@
+{% extends 'base.html' %} {% load static %} {% block head %}
+<style>
+  h1 {
+    font-family: cursive;
+    color: antiquewhite;
+  }
+  .box {
+    background: #f9f9f9;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgb(123, 118, 110);
+    text-align: justify;
+  }
+  .box img {
+    transition: all 0.3s ease-in-out; /* Smooth transition for hover effect */
+  }
+  .box img:hover {
+    transform: scale(1.1); /* Slight zoom effect */
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+  }
+  .myimg {
+    height: 300px;
+  }
+</style>
+{% endblock head %} {% block baseblock %}
+
+<div class="container-fluid">
+  <div
+    class="row py-5"
+    style="background: url('/static/images/c1.jpg'); background-size: 100% 100%"
+  >
+    <div class="col-md-8 mx-auto my-5">
+      <form action="{% url 'all_products' %}">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-5">
+              <input
+                type="text"
+                name="qry"
+                class="form-control"
+                placeholder="Search by Product Name..."
+              />
+            </div>
+            {% comment %}
+            <div class="col-md-5">
+              <input
+                type="text"
+                name="price"
+                class="form-control"
+                placeholder="Search by Price Less than..."
+              />
+            </div>
+            {% endcomment %}
+
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-success">Search</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- <h1>Hellow this is home page</h1> -->
+  <div class="row">
+    <div class="col-md-12 bg-primary text-center p-5 text-light">
+      <h1>Our Services({{categories|length}})</h1>
+    </div>
+
+    {% comment %} {% for x in categories %}
+    <div class="col-md-4 text-center p-5">
+      <div style="box-shadow: 0px 0px 10px rgb(123, 118, 110)" class="p-5">
+        <p>{{x.cat_name}}</p>
+      </div>
+
+      <div
+        style="box-shadow: 0px 0px 10px rgb(123, 118, 110)"
+        class="p-5 box text-align:justify"
+      >
+        <img src="/media/{{x.cover_pic}}" alt="" />
+        <p>{{x.description}}</p>
+        <a href="{% url 'all_products' %}?cat={{x.id}}">
+          <div class="box" style="height: 300px">
+            <h2>{{x.cat_name}}</h2>
+            <p>{{x.description}}</p>
+          </div>
+        </a>
+        <!-- <img src="{% static 'images/business.jpg' %}" alt="" /> -->
+        <!-- <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempore
+        consequatur vero corporis possimus minus architecto nostrum, accusantium
+        maiores. Vitae doloremque non cumque ipsam voluptates quos ratione at,
+        rem python manage.py createsuperuser python manage.py createsuperuser
+        python manage.py createsuperuser asperiores nesciunt!
+      </p> -->
+      </div>
+    </div>
+    {% endfor %} {% endcomment %} 
+    {% for c in categories %}
+  <div class="col-md-4 text-center p-5">
+    <div style="box-shadow: 0px 0px 10px rgb(123, 118, 110)" class="p-5 box text-align:justify">
+      <img src="/media/{{c.cover_pic}}" alt="" style="height:200px; width:auto;" />
+      <h2>{{c.cat_name}}</h2>
+      <p>{{c.description}}</p>
+      <a href="{% url 'all_products' %}?cat={{c.id}}">
+        <button class="btn btn-primary mt-2">View Products</button>
+      </a>
+    </div>
+  </div>
+{% endfor %}
+  </div>
+
+  <div class="row">
+    <div class="col-md-12 bg-primary text-center p-5 text-light">
+      <h1>Previous feedback</h1>
+      <em>Total Length:{{recent|length}} </em>
+      <div class="table">
+        <table class="table table-bordered table-striped table-hover">
+          <thead class="bg-dark text-light">
+            <tr>
+              <th>SN</th>
+              <th>Name</th>
+              <th>Contact</th>
+              <th>Subject</th>
+              <th>Message</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for contact in recent %}
+            <tr>
+              <!-- <td>{{forloop.counter}}</td> -->
+              <td>{{contact.id}}</td>
+              <td>{{contact.name}}</td>
+              <td>{{contact.contact_number}}</td>
+              <td>{{contact.subject}}</td>
+              <td>{{contact.message}}</td>
+              <td>{{contact.added_on}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% if status %}
+
+<script>
+  alert("{{status}}");
+  window.location = "{% url 'index' %}";
+</script>
+{% endif %} {% endblock %}
+<!-- <h1>Hellow this is home page</h1> -->

@@ -1,0 +1,144 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% block baseblock %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12 bg-primary text-center p-5 text-light">
+      <h1>Register</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div
+      class="col-md-6 px-0"
+      style="
+        background: url('/static/images/register.jpg');
+        background-size: 100% 100%;
+      "
+    >
+      <div class="h-100 p-5" style="background: rgba(220, 214, 214, 0.5)"></div>
+    </div>
+
+    <div class="col-md-6 p-5">
+      <form action="" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="first_name">First Name</label>
+              <input
+                type="text"
+                name="first_name"
+                id="first_name"
+                class="form-control"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="last_name">Last Name</label>
+              <input
+                type="text"
+                name="last_name"
+                id="last_name"
+                class="form-control"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="form-groupt">
+            <small id="result"></small>
+        </div>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            name="username"
+            id="username"
+            class="form-control"
+            onkeyup="checkuser()"
+            placeholder="Enter your username"
+
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            class="form-control"
+          />
+        </div>
+        <div class="form-group">
+          <label for="confirm_password">Confirm Password</label>
+          <input
+            type="password"
+            name="confirm_password"
+            id="confirm_password"
+            class="form-control"
+          />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" name="email" id="email" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="contact">Contact</label>
+          <input
+            type="number"
+            name="contact"
+            id="contact"
+            class="form-control"
+          />
+        </div>
+        <div class="form-group">
+          <label for="utype">User Type</label>
+          <select name="utype" id="utype" class="form-control">
+            <option value="cust">I am Customer</option>
+            <option value="sell">I am Seller</option>
+          </select>
+        </div>
+        <div class="form-group py-5">
+          <button class="btn btn-primary" id="btnSubmit">Register</button>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  function checkuser() {
+    let un = document.getElementById("username").value.trim();
+    console.log("Username entered:", un);
+    
+    if (un === "") {
+        $("#result").html("").removeClass("text-danger text-success");
+        $("#username").removeClass("alert alert-danger");
+        $("#btnSubmit").attr("disabled", true);
+        return;
+    }
+
+    $.ajax({
+        url: "{% url 'check_user' %}",
+        type: "get",
+        data: { usern: un },
+        success: function (data) {
+            if (data === "Exists") {
+                $("#result").html("This username is already taken").addClass("text-danger");
+                $("#username").addClass("alert alert-danger");
+                $("#btnSubmit").attr("disabled", "disabled");
+            } else if (data === "Available") {
+                $("#result").html("This username is available").addClass("text-success");
+                $("#username").removeClass("alert alert-danger");
+                $("#btnSubmit").removeAttr("disabled");
+            } else {
+                $("#result").html("Invalid username").addClass("text-danger");
+                $("#username").addClass("alert alert-danger");
+                $("#btnSubmit").attr("disabled", "disabled");
+            }
+        },
+        error: function () {
+            $("#result").html("Error checking username").addClass("text-danger");
+            $("#username").addClass("alert alert-danger");
+            $("#btnSubmit").attr("disabled", "disabled");
+        },
+    });
+  }
+</script>
+{% endblock baseblock %}
