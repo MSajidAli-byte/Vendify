@@ -1,0 +1,9 @@
+django
+django-bootstrap5
+django-paypal
+python-decouple
+
+
+django-extensions
+django-filter
+django-debug
